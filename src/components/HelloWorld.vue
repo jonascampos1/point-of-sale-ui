@@ -1,11 +1,15 @@
 <template>
-  <v-container>
-    <v-card title="Jonas" text="Hola mundo"
-  elevation="2"
-  outlined
-  shaped
-></v-card>
-  </v-container>
+  
+  <v-content>
+      <v-container fluid ma-0 pa-0 fill-height>
+        <v-layout row>
+          <v-flex xs4> Chat List </v-flex>
+          <v-flex xs4> Main Chat</v-flex>
+          <v-flex xs4> User Profile</v-flex>
+        </v-layout>
+      </v-container>
+    </v-content>
+    
 </template>
 
 <script lang='ts'>
@@ -19,53 +23,7 @@ export default defineComponent({
 
   data () {
     return {
-      ecosystem: [
-        {
-          text: 'vuetify-loader',
-          href: 'https://github.com/vuetifyjs/vuetify-loader/tree/next',
-        },
-        {
-          text: 'github',
-          href: 'https://github.com/vuetifyjs/vuetify/tree/next',
-        },
-        {
-          text: 'awesome-vuetify',
-          href: 'https://github.com/vuetifyjs/awesome-vuetify',
-        },
-      ],
-      importantLinks: [
-        {
-          text: 'Chat',
-          href: 'https://community.vuetifyjs.com',
-        },
-        {
-          text: 'Made with Vuetify',
-          href: 'https://madewithvuejs.com/vuetify',
-        },
-        {
-          text: 'Twitter',
-          href: 'https://twitter.com/vuetifyjs',
-        },
-        {
-          text: 'Articles',
-          href: 'https://medium.com/vuetify',
-        },
-      ],
-      logo,
-      whatsNext: [
-        {
-          text: 'Explore components',
-          href: 'https://vuetifyjs.com',
-        },
-        {
-          text: 'Roadmap',
-          href: 'https://vuetifyjs.com/en/introduction/roadmap/',
-        },
-        {
-          text: 'Frequently Asked Questions',
-          href: 'https://vuetifyjs.com/getting-started/frequently-asked-questions',
-        },
-      ],
+      logo: "",
     }
   },
 })
