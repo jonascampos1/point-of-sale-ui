@@ -37,7 +37,14 @@
               @click:append="show1 = !show1">
             </v-text-field>
             <v-row justify="end" class="mr-10">
-              <v-btn type="submit" form="loginForm" :disabled="!valid" elevation="2" @cklick="submit">Login</v-btn>
+              <v-btn 
+                type="submit" 
+                form="loginForm" 
+                class="mb-4"
+                :disabled="!valid" 
+                elevation="2" 
+                @cklick="submit" 
+                :loading="loading">Login</v-btn>
             </v-row>
           </v-form>
         </v-col>
@@ -72,10 +79,13 @@ import { defineComponent } from 'vue'
 import axios from 'axios'
 
 export default defineComponent({
-  name: 'HelloWorld',
+  name: 'login',
+  
 
   data () {
       return {
+        loader: null,
+        loading: false,
         username: '',
         valid: false,
         otp: '',
@@ -84,7 +94,7 @@ export default defineComponent({
         login_success: false,
         login_error: false,
         rules: {
-          numbers: value => Number(value) || 'Solo números',
+          numbers: value => this.is_number(value)  || 'Solo números',
           required: value => !!value || '(6 digitos).',
           min: v => v.length == 6 || '6 dígitos',
           emailMatch: () => (`The email and password you entered don't match`),
@@ -96,25 +106,51 @@ export default defineComponent({
         },
       }
     },
+    watch: {
+      loader () {
+        const l = this.loader
+        this[l] = !this[l]
+
+        setTimeout(() => (this[l] = false), 1000)
+
+        this.loader = null
+      },
+    },
     methods:{
+      is_number(v){
+        if(/^\d+$/.test(v)) return true
+      },
       onlyleters(v){
         if(/^[A-Za-z]+$/.test(v)) return true
       },
       submit(){
+        this.loader = 'loading'
         const userdata = { username : this.username , password: this.password }
           axios.post('http://127.0.0.1:3001/api/v1/login', userdata)
           .then(res => {
-            this.login_success=true
+            setTimeout(()=> {
+              this.login_success=true
+            },1000)
+            localStorage.setItem('user-info', JSON.stringify(res.data))
             setTimeout(()=>{
               this.login_success=false
-            },2000)
+              let user = JSON.stringify(res.data)
+              this.$router.push({name: 'home'})
+            },1000)
           })
           .catch(err => { 
-            this.login_error=true
+            
             setTimeout(()=>{
               this.login_error=false
-            },2000)
+              this.login_error=true
+            },1000)
           })
+      }
+    },
+    mounted(){
+      let user= localStorage.getItem('user-info')
+      if(user){
+        this.$router.push({name: 'home'})
       }
     }
 })
