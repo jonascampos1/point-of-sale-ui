@@ -19,7 +19,7 @@
         <v-col justify="center" class="mt-0 pl-2 pr-2">
 
           <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="submit" id="loginForm">
-            <v-text-field
+            <v-text-field ref="userinput"
               v-model="username"
               label="Usuario"
               :rules="[UsernameRules.required, UsernameRules.nonumbers]">
@@ -117,6 +117,9 @@ export default defineComponent({
       },
     },
     methods:{
+      focusInit(){
+        this.$refs.userinput.focus()
+      },
       is_number(v){
         if(/^\d+$/.test(v)) return true
       },
@@ -126,7 +129,7 @@ export default defineComponent({
       submit(){
         this.loader = 'loading'
         const userdata = { username : this.username , password: this.password }
-          axios.post('http://127.0.0.1:3001/api/v1/login', userdata)
+          axios.post(import.meta.env.VITE_API_URL+'login', userdata)
           .then(res => {
             setTimeout(()=> {
               this.login_success=true
@@ -148,6 +151,8 @@ export default defineComponent({
       }
     },
     mounted(){
+      
+      this.focusInit()
       let user= localStorage.getItem('user-info')
       if(user){
         this.$router.push({name: 'home'})
