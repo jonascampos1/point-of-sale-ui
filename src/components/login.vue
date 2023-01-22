@@ -1,12 +1,22 @@
 <template>
-  <v-container fluid class="fill-height">
+  <v-container fluid fill-height>
+    <v-layout fill-height>
     <v-col class="text-xl-caption text-xs-body-2">
       <v-row justify="center">
+        <v-img
+          contain
+          lazy-src="src/assets/images/pos.png"
+          max-height="45"
+          max-width="74"
+          src="src/assets/images/pos.png">
+        </v-img>
+        <h1>Punto de venta</h1>
+      </v-row>
+      
+      <v-row justify="center">
+        
       <v-card max-width="350" title="Login" class="v-col-sm-6  bg-grey-lighten-4" elevation="2">
         <v-col justify="center" class="mt-0 pl-2 pr-2">
-          <!--<v-icon size="small" color="grey" slot="prepend">
-            mdi-account
-          </v-icon>-->
 
           <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="submit" id="loginForm">
             <v-text-field
@@ -27,56 +37,64 @@
               @click:append="show1 = !show1">
             </v-text-field>
             <v-row justify="end" class="mr-10">
-              <v-btn type="submit" form="loginForm" :disabled="!valid" elevation="2" @cklick="submit">Login</v-btn>
+              <v-btn 
+                type="submit" 
+                form="loginForm" 
+                class="mb-4"
+                :disabled="!valid" 
+                elevation="2" 
+                @cklick="submit" 
+                :loading="loading">Login</v-btn>
             </v-row>
           </v-form>
         </v-col>
       </v-card>
       </v-row>
+
+      <v-row justify="center">
+        <v-col cols="3" justify="center">
+          <v-alert v-model="login_success" transition="fade-transition" class="mt-5"
+            density="comfortable"
+            type="success"
+            variant="tonal">
+            Acceso concedido
+          </v-alert>
+          <v-alert v-model="login_error" transition="fade-transition" class="mt-5"
+            density="comfortable"
+            type="warning"
+            variant="tonal">
+            Acceso denegado
+          </v-alert>
+        </v-col>
+      </v-row>
+
     </v-col>
-  </v-container>
 
-
-<!--
-  <v-container class="grey lighten-5">
-    <v-row no-gutters>
-      <v-col
-        v-for="n in 3"
-        :key="n"
-        cols="12"
-        sm="4"
-      >
-        <v-card
-          class="pa-2"
-          outlined
-          tile
-        >
-          One of three columns
-        </v-card>
-      </v-col>
-    </v-row>
+  </v-layout>
   </v-container>
-  -->
 </template>
 
 <script lang='ts'>
 import { defineComponent } from 'vue'
 import axios from 'axios'
-// Logo
-import logo from '../assets/logo.svg'
 
 export default defineComponent({
-  name: 'HelloWorld',
+  name: 'login',
+  
 
   data () {
       return {
+        loader: null,
+        loading: false,
         username: '',
         valid: false,
         otp: '',
         show1: false,
         password: '',
+        login_success: false,
+        login_error: false,
         rules: {
-          numbers: value => Number(value) || 'Solo números',
+          numbers: value => this.is_number(value)  || 'Solo números',
           required: value => !!value || '(6 digitos).',
           min: v => v.length == 6 || '6 dígitos',
           emailMatch: () => (`The email and password you entered don't match`),
@@ -88,20 +106,51 @@ export default defineComponent({
         },
       }
     },
+    watch: {
+      loader () {
+        const l = this.loader
+        this[l] = !this[l]
+
+        setTimeout(() => (this[l] = false), 1000)
+
+        this.loader = null
+      },
+    },
     methods:{
+      is_number(v){
+        if(/^\d+$/.test(v)) return true
+      },
       onlyleters(v){
         if(/^[A-Za-z]+$/.test(v)) return true
       },
       submit(){
+        this.loader = 'loading'
         const userdata = { username : this.username , password: this.password }
           axios.post('http://127.0.0.1:3001/api/v1/login', userdata)
           .then(res => {
-            // do something with res
-            alert('Success')
+            setTimeout(()=> {
+              this.login_success=true
+            },1000)
+            localStorage.setItem('user-info', JSON.stringify(res.data))
+            setTimeout(()=>{
+              this.login_success=false
+              let user = JSON.stringify(res.data)
+              this.$router.push({name: 'home'})
+            },1000)
           })
           .catch(err => { 
-            alert('Acceso denegado')
+            
+            setTimeout(()=>{
+              this.login_error=false
+              this.login_error=true
+            },1000)
           })
+      }
+    },
+    mounted(){
+      let user= localStorage.getItem('user-info')
+      if(user){
+        this.$router.push({name: 'home'})
       }
     }
 })
